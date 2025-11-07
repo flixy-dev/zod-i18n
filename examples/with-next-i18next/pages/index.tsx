@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { makeZodI18nMap } from "zod-i18n-map";
+import { makeZodI18nMap } from "@semihbou/zod-i18n-map";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation, Trans } from "next-i18next";
@@ -30,11 +30,23 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-const schema = z.object({
-  username: z.string().min(5),
-  email: z.email(),
-  favoriteNumber: z.number().max(10).min(1),
-});
+const schema = z
+  .object({
+    username: z.string().min(5),
+    email: z.email(),
+    favoriteNumber: z.number().max(10).min(1),
+    customError: z.string(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.customError.length < 8 || !val.customError.endsWith("test")) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["customError"],
+        fatal: true,
+        message: "Test error",
+      });
+    }
+  });
 
 export default function HookForm() {
   const { t } = useTranslation();
@@ -148,6 +160,15 @@ export default function HookForm() {
           />
           <FormErrorMessage>
             {(errors.favoriteNumber?.message ?? "") as string}
+          </FormErrorMessage>
+        </FormControl>
+        <FormControl isInvalid={!!errors.customError} mb={4}>
+          <FormLabel htmlFor="customError">
+            <Trans>customError</Trans>
+          </FormLabel>
+          <Input id="customError" {...register("customError")} />
+          <FormErrorMessage>
+            {(errors.customError?.message ?? "") as string}
           </FormErrorMessage>
         </FormControl>
         <Button

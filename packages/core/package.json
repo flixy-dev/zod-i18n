@@ -1,6 +1,6 @@
 {
   "name": "@semihbou/zod-i18n-map",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A library for localizing zod error messages.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -23,7 +23,7 @@
   },
   "peerDependencies": {
     "i18next": ">=21.3.0",
-    "zod": ">=3.17.0"
+    "zod": ">=4.0.0"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.3",

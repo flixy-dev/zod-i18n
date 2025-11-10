@@ -1,3 +1,36 @@
+This is my shot at adapting zod-i18n-map to zod v4, it's not perfect but from my first tests, it seems to work.
+
+# Disclaimer
+### This is an experimental version, some features may be broken.
+
+## Installation
+
+```bash
+pnpm install @semihbou/zod-i18n-map
+```
+
+## How I use it
+```ts
+import i18next, {getFixedT, init, use as i18nUse} from 'i18next';
+import {initReactI18next} from 'react-i18next';
+import {z} from "zod";
+import {makeZodI18nMap} from '@semihbou/zod-i18n-map';
+
+i18nUse(initReactI18next);
+init({
+    ns: ['common'],
+    detection: options,
+    resources, // Same as the original
+}).then(() => {
+    const t = getFixedT(null, 'common');
+    z.config({
+        customError: makeZodI18nMap({t, ns: "common"})
+    });
+});
+```
+No need to export a new zod instance, just use the default zod export.
+### Original readme below:
+___
 [![npm version](https://badge.fury.io/js/zod-i18n-map.svg)](https://badge.fury.io/js/zod-i18n-map)
 [![codecov](https://codecov.io/gh/aiji42/zod-i18n/branch/main/graph/badge.svg?token=XHRXA3C2D3)](https://codecov.io/gh/aiji42/zod-i18n)
 [![CI](https://github.com/aiji42/zod-i18n/actions/workflows/ci.yml/badge.svg)](https://github.com/aiji42/zod-i18n/actions/workflows/ci.yml)

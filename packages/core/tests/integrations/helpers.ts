@@ -10,7 +10,9 @@ export const init = async (lng: string) => {
       [lng]: { zod: translation },
     },
   });
-  z.setErrorMap(zodI18nMap);
+  z.config({
+    customError: zodI18nMap,
+  });
 };
 
 export * from "../helpers";

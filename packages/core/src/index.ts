@@ -1,5 +1,6 @@
 import { $ZodErrorMap } from "zod/v4/core";
 import i18next, { i18n } from "i18next";
+import { ZodLiteral, ZodEnum, ZodUnion, ZodDiscriminatedUnion } from "zod/v4";
 
 const jsonStringifyReplacer = (_: string, value: any): any => {
   if (typeof value === "bigint") {
@@ -60,6 +61,28 @@ export type HandlePathOption = {
 
 const defaultNs = "zod";
 
+const getReceivedDataType = (data: unknown): string => {
+  const typeofData = typeof data;
+
+  switch (typeofData) {
+    case "number": {
+      if (Number.isNaN(data)) return "NaN";
+      else if (Number.isInteger(data)) return "number";
+      else return "float";
+    }
+    case "object": {
+      if (Array.isArray(data)) return "array";
+      else if (data === null) return "null";
+      else if (
+        Object.getPrototypeOf(data) !== Object.prototype &&
+        data?.constructor
+      )
+        return data.constructor.name;
+    }
+  }
+  return typeofData;
+};
+
 export const makeZodI18nMap: MakeZodI18nMap = (option) => (issue) => {
   const { t, ns, handlePath } = {
     t: i18next.t,
@@ -97,45 +120,67 @@ export const makeZodI18nMap: MakeZodI18nMap = (option) => (issue) => {
 
   switch (issue.code) {
     case "invalid_type":
-      switch (issue.expected) {
-        case "undefined":
-          message = t("errors.invalid_type_received_undefined", {
+      if (issue.input === undefined) {
+        message = t("errors.invalid_type_received_undefined", {
+          ns,
+          defaultValue: message,
+          ...path,
+        });
+      } else if (issue.input === null) {
+        message = t("errors.invalid_type_received_null", {
+          ns,
+          defaultValue: message,
+          ...path,
+        });
+      } else if (issue.input === Infinity) {
+        message = t("errors.not_finite", {
+          ns,
+          defaultValue: message,
+          ...path,
+        });
+      } else if (
+        issue.input instanceof Date &&
+        Number.isNaN(issue.input.getTime())
+      ) {
+        message = t("errors.invalid_date", {
+          ns,
+          defaultValue: message,
+          ...path,
+        });
+      } else {
+        const received = getReceivedDataType(issue.input).toLocaleLowerCase();
+        message = t("errors.invalid_type", {
+          expected: t(`types.${issue.expected}`, {
+            defaultValue: issue.expected,
             ns,
-            defaultValue: message,
-            ...path,
-          });
-          break;
-        case "null":
-          message = t("errors.invalid_type_received_null", {
+          }),
+          received: t(`types.${received}`, {
+            defaultValue: received,
             ns,
-            defaultValue: message,
-            ...path,
-          });
-          break;
-        default:
-          message = t("errors.invalid_type", {
-            expected: t(`types.${issue.expected}`, {
-              defaultValue: issue.expected,
-              ns,
-            }),
-            received: t(`types.${issue.received}`, {
-              defaultValue: issue.received,
-              ns,
-            }),
-            ns,
-            defaultValue: message,
-            ...path,
-          });
-          break;
+          }),
+          ns,
+          defaultValue: message,
+          ...path,
+        });
       }
       break;
     case "invalid_value":
-      message = t("errors.invalid_literal", {
-        expected: JSON.stringify(issue.expected, jsonStringifyReplacer),
-        ns,
-        defaultValue: message,
-        ...path,
-      });
+      if (issue.inst instanceof ZodLiteral) {
+        message = t("errors.invalid_literal", {
+          expected: joinValues(issue.values),
+          ns,
+          defaultValue: message,
+          ...path,
+        });
+      } else if (issue.inst instanceof ZodEnum) {
+        message = t("errors.invalid_enum_value", {
+          options: joinValues(issue.values),
+          received: issue.input,
+          ns,
+          defaultValue: message,
+          ...path,
+        });
+      }
       break;
     case "unrecognized_keys":
       message = t("errors.unrecognized_keys", {
@@ -147,11 +192,30 @@ export const makeZodI18nMap: MakeZodI18nMap = (option) => (issue) => {
       });
       break;
     case "invalid_union":
-      message = t("errors.invalid_union", {
-        ns,
-        defaultValue: message,
-        ...path,
-      });
+      // This one must be first (narrower type)
+      if (issue.inst instanceof ZodDiscriminatedUnion) {
+        const options = issue.inst?.def.options.map(
+          (opt: any) => opt.def.shape.type.def.values[0]
+        );
+        message = t("errors.invalid_union_discriminator", {
+          options: joinValues(options),
+          ns,
+          defaultValue: message,
+          ...path,
+        });
+      } else if (issue.inst instanceof ZodUnion) {
+        message = t("errors.invalid_union", {
+          ns,
+          defaultValue: message,
+          ...path,
+        });
+      } else {
+        message = t("errors.invalid_union", {
+          ns,
+          defaultValue: message,
+          ...path,
+        });
+      }
       break;
     case "invalid_format":
       if (issue.format === "date") {
@@ -162,14 +226,14 @@ export const makeZodI18nMap: MakeZodI18nMap = (option) => (issue) => {
         });
       } else if (issue.format === "starts_with") {
         message = t(`errors.invalid_string.startsWith`, {
-          startsWith: issue.format,
+          startsWith: issue.prefix,
           ns,
           defaultValue: message,
           ...path,
         });
       } else if (issue.format === "ends_with") {
         message = t(`errors.invalid_string.endsWith`, {
-          endsWith: issue.format,
+          endsWith: issue.suffix,
           ns,
           defaultValue: message,
           ...path,
@@ -253,7 +317,6 @@ export const makeZodI18nMap: MakeZodI18nMap = (option) => (issue) => {
       break;
     default:
   }
-
   return { message };
 };
 

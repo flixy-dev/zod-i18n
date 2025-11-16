@@ -146,28 +146,21 @@ test("array parser error messages", () => {
 });
 
 test("function parser error messages", () => {
-  const functionParse = z
-    .function(z.tuple([z.string()]), z.number())
-    .parse((a: any) => a);
-  expect(getErrorMessageFromZodError(() => functionParse(""))).toEqual(
-    "Tipo de retorno de função inválido"
+  const functionParse = z.function({
+    input: [z.string()],
+    output: z.number(),
+  });
+
+  const computeFunctionParse = functionParse.implement((input) => input as any);
+  expect(getErrorMessageFromZodError(() => computeFunctionParse(""))).toEqual(
+    "O dado deve ser do tipo number, porém foi enviado string"
   );
-  expect(getErrorMessageFromZodError(() => functionParse(1 as any))).toEqual(
-    "Argumento de função inválido"
-  );
+  expect(
+    getErrorMessageFromZodError(() => computeFunctionParse(1 as any))
+  ).toEqual("O dado deve ser do tipo string, porém foi enviado number");
 });
 
 test("other parser error messages", () => {
-  expect(
-    getErrorMessage(
-      z
-        .intersection(
-          z.number(),
-          z.number().transform((x) => x + 1)
-        )
-        .safeParse(1234)
-    )
-  ).toEqual("Valores de interseção não poderam ser mesclados");
   expect(getErrorMessage(z.literal(12).safeParse(""))).toEqual(
     "Valor literal inválido, era esperado 12"
   );

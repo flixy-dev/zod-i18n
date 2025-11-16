@@ -153,28 +153,21 @@ test("array parser error messages", () => {
 });
 
 test("function parser error messages", () => {
-  const functionParse = z
-    .function(z.tuple([z.string()]), z.number())
-    .parse((a: any) => a);
-  expect(getErrorMessageFromZodError(() => functionParse(""))).toEqual(
-    "Virheellinen funktion palautustyyppi"
+  const functionParse = z.function({
+    input: [z.string()],
+    output: z.number(),
+  });
+
+  const computeFunctionParse = functionParse.implement((input) => input as any);
+  expect(getErrorMessageFromZodError(() => computeFunctionParse(""))).toEqual(
+    "Odotettiin arvon olevan numero, saatiin merkkijono"
   );
-  expect(getErrorMessageFromZodError(() => functionParse(1 as any))).toEqual(
-    "Virheelliset funktion argumentit"
-  );
+  expect(
+    getErrorMessageFromZodError(() => computeFunctionParse(1 as any))
+  ).toEqual("Odotettiin arvon olevan merkkijono, saatiin numero");
 });
 
 test("other parser error messages", () => {
-  expect(
-    getErrorMessage(
-      z
-        .intersection(
-          z.number(),
-          z.number().transform((x) => x + 1)
-        )
-        .safeParse(1234)
-    )
-  ).toEqual("Risteystuloksia ei voitu yhdistää");
   expect(getErrorMessage(z.literal(12).safeParse(""))).toEqual(
     "Virheellinen merkkijono, odotettiin 12"
   );

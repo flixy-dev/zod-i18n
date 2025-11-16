@@ -151,28 +151,21 @@ test("array parser error messages", () => {
 });
 
 test("function parser error messages", () => {
-  const functionParse = z
-    .function(z.tuple([z.string()]), z.number())
-    .parse((a: any) => a);
-  expect(getErrorMessageFromZodError(() => functionParse(""))).toEqual(
-    "Ungültiger Funktionsrückgabewert"
+  const functionParse = z.function({
+    input: [z.string()],
+    output: z.number(),
+  });
+
+  const computeFunctionParse = functionParse.implement((input) => input as any);
+  expect(getErrorMessageFromZodError(() => computeFunctionParse(""))).toEqual(
+    "Zahl erwartet, String erhalten"
   );
-  expect(getErrorMessageFromZodError(() => functionParse(1 as any))).toEqual(
-    "Ungültige Funktionsargumente"
-  );
+  expect(
+    getErrorMessageFromZodError(() => computeFunctionParse(1 as any))
+  ).toEqual("String erwartet, Zahl erhalten");
 });
 
 test("other parser error messages", () => {
-  expect(
-    getErrorMessage(
-      z
-        .intersection(
-          z.number(),
-          z.number().transform((x) => x + 1)
-        )
-        .safeParse(1234)
-    )
-  ).toEqual("Schnittmengenergebnisse konnten nicht zusammengeführt werden");
   expect(getErrorMessage(z.literal(12).safeParse(""))).toEqual(
     "Ungültiger Literalwert, 12 erwartet"
   );

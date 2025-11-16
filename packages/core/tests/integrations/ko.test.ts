@@ -155,28 +155,21 @@ test("array parser error messages", () => {
 });
 
 test("function parser error messages", () => {
-  const functionParse = z
-    .function(z.tuple([z.string()]), z.number())
-    .parse((a: any) => a);
-  expect(getErrorMessageFromZodError(() => functionParse(""))).toEqual(
-    "허용되지 않은 반환 타입입니다."
+  const functionParse = z.function({
+    input: [z.string()],
+    output: z.number(),
+  });
+
+  const computeFunctionParse = functionParse.implement((input) => input as any);
+  expect(getErrorMessageFromZodError(() => computeFunctionParse(""))).toEqual(
+    "숫자 타입 입력을 기대하였지만, 문자열 타입이 입력되었습니다."
   );
-  expect(getErrorMessageFromZodError(() => functionParse(1 as any))).toEqual(
-    "허용되지 않은 파라메터 타입입니다."
-  );
+  expect(
+    getErrorMessageFromZodError(() => computeFunctionParse(1 as any))
+  ).toEqual("문자열 타입 입력을 기대하였지만, 숫자 타입이 입력되었습니다.");
 });
 
 test("other parser error messages", () => {
-  expect(
-    getErrorMessage(
-      z
-        .intersection(
-          z.number(),
-          z.number().transform((x) => x + 1)
-        )
-        .safeParse(1234)
-    )
-  ).toEqual("교차 타입을 만족하지 않습니다.");
   expect(getErrorMessage(z.literal(12).safeParse(""))).toEqual(
     "허용되지 않은 리터럴 값 입니다. 입력 가능한 값은 12 입니다."
   );

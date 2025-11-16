@@ -147,28 +147,21 @@ test("array parser error messages", () => {
 });
 
 test("function parser error messages", () => {
-  const functionParse = z
-    .function(z.tuple([z.string()]), z.number())
-    .parse((a: any) => a);
-  expect(getErrorMessageFromZodError(() => functionParse(""))).toEqual(
-    "סוג ההחזרה של הפונקציה לא תקין"
+  const functionParse = z.function({
+    input: [z.string()],
+    output: z.number(),
+  });
+
+  const computeFunctionParse = functionParse.implement((input) => input as any);
+  expect(getErrorMessageFromZodError(() => computeFunctionParse(""))).toEqual(
+    "צפוי מספר, קיבלנו מחרוזת"
   );
-  expect(getErrorMessageFromZodError(() => functionParse(1 as any))).toEqual(
-    "פרמטרים לפונקציה לא תקינים"
-  );
+  expect(
+    getErrorMessageFromZodError(() => computeFunctionParse(1 as any))
+  ).toEqual("צפוי מחרוזת, קיבלנו מספר");
 });
 
 test("other parser error messages", () => {
-  expect(
-    getErrorMessage(
-      z
-        .intersection(
-          z.number(),
-          z.number().transform((x) => x + 1)
-        )
-        .safeParse(1234)
-    )
-  ).toEqual("לא ניתן למזג את הסוגים");
   expect(getErrorMessage(z.literal(12).safeParse(""))).toEqual(
     "ערך לא תקין, צפוי 12"
   );

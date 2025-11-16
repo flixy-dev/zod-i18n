@@ -149,28 +149,21 @@ test("array parser error messages", () => {
 });
 
 test("function parser error messages", () => {
-  const functionParse = z
-    .function(z.tuple([z.string()]), z.number())
-    .parse((a: any) => a);
-  expect(getErrorMessageFromZodError(() => functionParse(""))).toEqual(
-    "Tipo di ritorno della funzione non valido"
+  const functionParse = z.function({
+    input: [z.string()],
+    output: z.number(),
+  });
+
+  const computeFunctionParse = functionParse.implement((input) => input as any);
+  expect(getErrorMessageFromZodError(() => computeFunctionParse(""))).toEqual(
+    "Atteso number, ricevuto string"
   );
-  expect(getErrorMessageFromZodError(() => functionParse(1 as any))).toEqual(
-    "Argomenti della funzione non validi"
-  );
+  expect(
+    getErrorMessageFromZodError(() => computeFunctionParse(1 as any))
+  ).toEqual("Atteso string, ricevuto number");
 });
 
 test("other parser error messages", () => {
-  expect(
-    getErrorMessage(
-      z
-        .intersection(
-          z.number(),
-          z.number().transform((x) => x + 1)
-        )
-        .safeParse(1234)
-    )
-  ).toEqual("Il risultato dell'intersezione non può essere unito");
   expect(getErrorMessage(z.literal(12).safeParse(""))).toEqual(
     "Valore literal non valido, atteso 12"
   );

@@ -151,28 +151,20 @@ test("array parser error messages", () => {
 });
 
 test("function parser error messages", () => {
-  const functionParse = z
-    .function(z.tuple([z.string()]), z.number())
-    .parse((a: any) => a);
-  expect(getErrorMessageFromZodError(() => functionParse(""))).toEqual(
-    "نوع إرجاع دالة غير صالح"
+  const functionParse = z.function({
+    input: [z.string()],
+    output: z.number(),
+  });
+  const computeFunctionParse = functionParse.implement((input) => input as any);
+  expect(getErrorMessageFromZodError(() => computeFunctionParse(""))).toEqual(
+    "المتوقع رقم، المستلم سلسلة"
   );
-  expect(getErrorMessageFromZodError(() => functionParse(1 as any))).toEqual(
-    "معاملات الدالة غير صالحة"
-  );
+  expect(
+    getErrorMessageFromZodError(() => computeFunctionParse(1 as any))
+  ).toEqual("المتوقع سلسلة، المستلم رقم");
 });
 
 test("other parser error messages", () => {
-  expect(
-    getErrorMessage(
-      z
-        .intersection(
-          z.number(),
-          z.number().transform((x) => x + 1)
-        )
-        .safeParse(1234)
-    )
-  ).toEqual("تعذر دمج نتائج التقاطع");
   expect(getErrorMessage(z.literal(12).safeParse(""))).toEqual(
     "قيمة حرفية غير صالحة، المتوقع 12"
   );

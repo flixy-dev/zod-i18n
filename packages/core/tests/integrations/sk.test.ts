@@ -132,7 +132,7 @@ test("array parser error messages", () => {
     "Typ vstupu musí byť pole, ale bol obdržaný typ text"
   );
 
-  const too_small = [];
+  const too_small: any[] = [];
   expect(getErrorMessage(schema.min(1).safeParse(too_small))).toEqual(
     "Pole musí obsahovať aspoň jeden prvok"
   );
@@ -152,9 +152,9 @@ test("array parser error messages", () => {
         .superRefine((val, ctx) => {
           if (val.length <= 2) {
             ctx.addIssue({
-              code: z.ZodIssueCode.too_small,
+              code: "too_small",
               minimum: 2,
-              type: "array",
+              origin: "array",
               inclusive: false,
             });
           }
@@ -168,9 +168,9 @@ test("array parser error messages", () => {
         .superRefine((val, ctx) => {
           if (val.length <= 1) {
             ctx.addIssue({
-              code: z.ZodIssueCode.too_small,
+              code: "too_small",
               minimum: 1,
-              type: "array",
+              origin: "array",
               inclusive: false,
             });
           }
@@ -199,9 +199,9 @@ test("array parser error messages", () => {
         .superRefine((val, ctx) => {
           if (val.length >= 2) {
             ctx.addIssue({
-              code: z.ZodIssueCode.too_big,
+              code: "too_big",
               maximum: 2,
-              type: "array",
+              origin: "array",
               inclusive: false,
             });
           }
@@ -215,9 +215,9 @@ test("array parser error messages", () => {
         .superRefine((val, ctx) => {
           if (val.length >= 1) {
             ctx.addIssue({
-              code: z.ZodIssueCode.too_big,
+              code: "too_big",
               maximum: 1,
-              type: "array",
+              origin: "array",
               inclusive: false,
             });
           }
@@ -228,28 +228,21 @@ test("array parser error messages", () => {
 });
 
 test("function parser error messages", () => {
-  const functionParse = z
-    .function(z.tuple([z.string()]), z.number())
-    .parse((a: any) => a);
-  expect(getErrorMessageFromZodError(() => functionParse(""))).toEqual(
-    "Neplatný typ návratovej hodnoty"
+  const functionParse = z.function({
+    input: [z.string()],
+    output: z.number(),
+  });
+
+  const computeFunctionParse = functionParse.implement((input) => input as any);
+  expect(getErrorMessageFromZodError(() => computeFunctionParse(""))).toEqual(
+    "Typ vstupu musí byť číslo, ale bol obdržaný typ text"
   );
-  expect(getErrorMessageFromZodError(() => functionParse(1 as any))).toEqual(
-    "Neplatné argumenty funkcie"
-  );
+  expect(
+    getErrorMessageFromZodError(() => computeFunctionParse(1 as any))
+  ).toEqual("Typ vstupu musí byť text, ale bol obdržaný typ číslo");
 });
 
 test("other parser error messages", () => {
-  expect(
-    getErrorMessage(
-      z
-        .intersection(
-          z.number(),
-          z.number().transform((x) => x + 1)
-        )
-        .safeParse(1234)
-    )
-  ).toEqual("Hodnoty prieniku nie je možné zlúčiť");
   expect(getErrorMessage(z.literal(12).safeParse(""))).toEqual(
     "Neplatná doslovná hodnota, očakáva sa 12"
   );

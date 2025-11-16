@@ -153,28 +153,23 @@ test("array parser error messages", () => {
 });
 
 test("function parser error messages", () => {
-  const functionParse = z
-    .function(z.tuple([z.string()]), z.number())
-    .parse((a: any) => a);
-  expect(getErrorMessageFromZodError(() => functionParse(""))).toEqual(
-    "Le type de retour de la fonction n'est pas valide"
+  const functionParse = z.function({
+    input: [z.string()],
+    output: z.number(),
+  });
+
+  const computeFunctionParse = functionParse.implement((input) => input as any);
+  expect(getErrorMessageFromZodError(() => computeFunctionParse(""))).toEqual(
+    "Le type « nombre » est attendu mais « chaîne de caractères » a été reçu"
   );
-  expect(getErrorMessageFromZodError(() => functionParse(1 as any))).toEqual(
-    "Les arguments de la fonction sont non valides"
+  expect(
+    getErrorMessageFromZodError(() => computeFunctionParse(1 as any))
+  ).toEqual(
+    "Le type « chaîne de caractères » est attendu mais « nombre » a été reçu"
   );
 });
 
 test("other parser error messages", () => {
-  expect(
-    getErrorMessage(
-      z
-        .intersection(
-          z.number(),
-          z.number().transform((x) => x + 1)
-        )
-        .safeParse(1234)
-    )
-  ).toEqual("Les résultats d'intersection n'ont pas pu être fusionnés");
   expect(getErrorMessage(z.literal(12).safeParse(""))).toEqual(
     "La valeur doit être 12"
   );

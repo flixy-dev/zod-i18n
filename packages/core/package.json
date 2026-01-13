@@ -1,6 +1,6 @@
 {
   "name": "@flixy-dev/zod-i18n-map",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A library for localizing zod error messages.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -22,7 +22,7 @@
     "test:coverage": "vitest run --coverage",
     "clean": "rimraf dist",
     "release": "semantic-release",
-    "prepack": "yarn build"
+    "prepack": "pnpm build"
   },
   "peerDependencies": {
     "i18next": ">=21.3.0",

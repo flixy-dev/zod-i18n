@@ -185,6 +185,16 @@ test("other parser error messages", () => {
     )
   ).toEqual("Neplatná hodnota diskriminátoru. Očekává se 'a' | 'b'");
   expect(
+    getErrorMessage(
+      z
+        .discriminatedUnion("kind", [
+          z.object({ kind: z.literal("a"), a: z.string() }),
+          z.object({ kind: z.literal("b"), b: z.string() }),
+        ])
+        .safeParse({ kind: "c", c: "abc" })
+    )
+  ).toEqual("Neplatná hodnota diskriminátoru. Očekává se 'a' | 'b'");
+  expect(
     getErrorMessage(z.union([z.string(), z.number()]).safeParse([true]))
   ).toEqual("Neplatný vstup");
   expect(

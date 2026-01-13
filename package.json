@@ -1,31 +1,28 @@
 {
-  "name": "zod-i18n",
-  "version": "0.0.0",
+  "name": "@flixy-dev/zod-i18n",
+  "version": "0.0.1",
   "description": "A library for localizing zod error messages.",
-  "repository": "git@github.com:VC-Semih/zod-i18n.git",
+  "repository": "git@github.com:flixy-dev/zod-i18n.git",
   "author": "VC-Semih <semihciftci.pro@gmail.com>",
   "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "run-p dev:*",
-    "dev:core": "yarn workspace @semihbou/zod-i18n-map dev",
-    "dev:with-next-i18next": "yarn workspace with-next-i18next dev",
-    "build": "yarn workspace @semihbou/zod-i18n-map build",
-    "coverage": "yarn workspace @semihbou/zod-i18n-map test:coverage",
-    "test": "yarn workspace @semihbou/zod-i18n-map test",
-    "release": "yarn workspace @semihbou/zod-i18n-map release",
+    "dev:core": "pnpm --filter=@semihbou/zod-i18n-map dev",
+    "dev:with-next-i18next": "pnpm --filter=with-next-i18next dev",
+    "build": "pnpm --filter=@semihbou/zod-i18n-map build",
+    "coverage": "pnpm --filter=@semihbou/zod-i18n-map test:coverage",
+    "test": "pnpm --filter=@semihbou/zod-i18n-map test",
+    "release": "pnpm --filter=@semihbou/zod-i18n-map release",
     "prepare": "husky install"
   },
-  "workspaces": [
-    "packages/*",
-    "examples/*"
-  ],
   "devDependencies": {
     "@commitlint/cli": "^17.4.2",
     "@commitlint/config-conventional": "^17.4.2",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.0",
     "npm-run-all": "^4.1.5",
+    "oxfmt": "^0.24.0",
     "prettier": "^2.8.3",
     "semantic-release": "^20.1.0",
     "semantic-release-monorepo": "^7.0.5"
@@ -37,8 +34,9 @@
   },
   "engines": {
     "node": ">=18",
-    "npm": "please_use_yarn_instead",
-    "yarn": ">=1.22"
+    "npm": "please_use_pnpm_instead",
+    "yarn": "please_use_pnpm_instead",
+    "pnpm": ">=8.0.0"
   },
   "release": {
     "extends": "semantic-release-monorepo",

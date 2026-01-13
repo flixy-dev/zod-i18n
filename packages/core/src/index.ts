@@ -201,7 +201,7 @@ export const makeZodI18nMap: MakeZodI18nMap = (option) => (issue) => {
       // This one must be first (narrower type)
       if (issue.inst instanceof ZodDiscriminatedUnion) {
         const options = issue.inst?.def.options.map(
-          (opt: any) => opt.def.shape.type.def.values[0]
+          (opt: any) => opt.def.shape[issue.discriminator!].def.values[0]
         );
         message = t("errors.invalid_union_discriminator", {
           options: joinValues(options),

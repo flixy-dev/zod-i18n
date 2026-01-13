@@ -1,5 +1,5 @@
 {
-  "name": "@semihbou/zod-i18n-map",
+  "name": "@flixy-dev/zod-i18n-map",
   "version": "0.0.3",
   "description": "A library for localizing zod error messages.",
   "main": "dist/index.js",
@@ -9,7 +9,10 @@
     "dist",
     "locales"
   ],
-  "repository": "https://github.com/VC-Semih/zod-i18n",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "https://github.com/flixy-dev/zod-i18n",
   "author": "VC-Semih <semihciftci.pro@gmail.com>",
   "license": "MIT",
   "scripts": {

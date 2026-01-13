@@ -23,9 +23,9 @@ jobs:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Install dependencies 💿
-        run: yarn install --frozen-lockfile
+        run: pnpm install
       - name: Run Tests 🧪
-        run: yarn coverage
+        run: pnpm coverage
       - name: Report coverage 📏
         uses: codecov/codecov-action@v3
         with:
@@ -50,12 +50,12 @@ jobs:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Install dependencies 💿
-        run: yarn install --frozen-lockfile
+        run: pnpm install
       - name: Publish 🚀
         run: |
           rm .npmrc
           cp ./README.md ./packages/core/README.md
-          yarn run release
+          pnpm run release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

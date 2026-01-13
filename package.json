@@ -11,12 +11,12 @@
   },
   "scripts": {
     "dev": "run-p dev:*",
-    "dev:core": "pnpm --filter=@semihbou/zod-i18n-map dev",
+    "dev:core": "pnpm --filter=@flixy-dev/zod-i18n-map dev",
     "dev:with-next-i18next": "pnpm --filter=with-next-i18next dev",
-    "build": "pnpm --filter=@semihbou/zod-i18n-map build",
-    "coverage": "pnpm --filter=@semihbou/zod-i18n-map test:coverage",
-    "test": "pnpm --filter=@semihbou/zod-i18n-map test",
-    "release": "pnpm --filter=@semihbou/zod-i18n-map release",
+    "build": "pnpm --filter=@flixy-dev/zod-i18n-map build",
+    "coverage": "pnpm --filter=@flixy-dev/zod-i18n-map test:coverage",
+    "test": "pnpm --filter=@flixy-dev/zod-i18n-map test",
+    "release": "pnpm --filter=@flixy-dev/zod-i18n-map release",
     "prepare": "husky install"
   },
   "devDependencies": {

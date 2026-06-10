@@ -55,6 +55,7 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+      id-token: write
     if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/beta' }}
     steps:
       - uses: actions/checkout@v4
@@ -63,7 +64,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.18
+          node-version: 24
 
       - uses: pnpm/action-setup@v3
         name: Install pnpm
@@ -91,5 +92,4 @@ jobs:
           cp ./README.md ./packages/core/README.md
           pnpm run release
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

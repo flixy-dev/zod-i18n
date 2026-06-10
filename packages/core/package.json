@@ -10,9 +10,13 @@
     "locales"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
-  "repository": "https://github.com/flixy-dev/zod-i18n",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flixy-dev/zod-i18n.git"
+  },
   "author": "VC-Semih <semihciftci.pro@gmail.com>",
   "license": "MIT",
   "scripts": {
